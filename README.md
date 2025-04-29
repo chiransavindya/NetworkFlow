@@ -1,64 +1,66 @@
-# Network Flow Algorithm Implementation
-Student ID: w2081928
-Name: N.A.C.S.Senarath
+# Network Flow Algorithm
 
-This project implements the Ford-Fulkerson algorithm to find the maximum flow in a network.
+<div align="center">
+  <h3>Maximum Flow Problem Solver</h3>
+  <p><i>A Java implementation of the Ford-Fulkerson algorithm</i></p>
+</div>
 
-## Project Structure
+---
+
+## 📋 Overview
+
+This application solves the maximum flow problem using the Ford-Fulkerson algorithm with Depth-First Search. It calculates the maximum possible flow from a source node (node 0) to a sink node (last node) in a directed graph where each edge has a capacity constraint.
+
+<div align="center">
+  <i>Example network with max flow of 8:</i><br>
+  <pre>
+    [0] --6--> [1] --3--> [3]
+     |          |          ⬆
+     |          |          |
+     4          2          5
+     |          |          |
+     ↓          ↓          |
+    [2] --------→----------
+  </pre>
+</div>
+
+## 🗂️ Project Structure
 
 ```
 src/
 ├── Main.java               # Program entry point
 ├── FlowNetwork.java        # Network data structure
-├── Edge.java              # Edge representation
-├── NetworkParser.java     # File parsing
-├── MaxFlowAlgorithm.java  # Algorithm implementation
-└── FlowResult.java        # Result structure
-benchmarks/
-├── bridge_*.txt           # Bridge network test cases
-└── ladder_*.txt          # Ladder network test cases
-sample_network.txt       # Default input file
+├── Edge.java               # Edge representation
+├── NetworkParser.java      # File parsing
+├── MaxFlowAlgorithm.java   # Algorithm implementation
+└── FlowResult.java         # Result structure
+sample_network.txt          # Default test network
 ```
 
-## Compilation
+## 🚀 Getting Started
 
-To compile the project, run the following command in the project's root directory:
+### Compilation
+
 ```bash
 javac src/*.java
 ```
-This will create the necessary `.class` files inside the `src` directory.
 
-## Running the Program
+### Execution
 
-The program is currently set up to read its input from a hardcoded file path within `src/Main.java`. By default, this is set to `sample_network.txt`.
-
-To run the program using the default input file:
 ```bash
 java -cp src Main
 ```
 
-To run the program with a different input file (e.g., one from the `benchmarks` directory):
-1.  **Modify `src/Main.java`:** Change the line `String inputFile = "sample_network.txt";` to the desired file path, for example: `String inputFile = "benchmarks/bridge_1.txt";`
-2.  **Recompile:** `javac src/Main.java` (or `javac src/*.java` if other files changed).
-3.  **Run:** `java -cp src Main`
+The program reads from `sample_network.txt` by default and displays:
+- Total nodes in the network
+- Each augmenting path found during execution
+- Final flow values for each edge
+- Total maximum flow and execution time
 
-For larger networks (especially from the benchmarks), you may need to increase the Java heap size using the `-Xmx` flag:
-```bash
-java -Xmx1g -cp src Main 
-```
-(Adjust `1g` to `512m`, `2g`, etc., as needed).
+## 📄 Input File Format
 
+The input file `sample_network.txt` follows this format:
 
-## Input File Format
-
-The input file should be formatted as follows:
-- First line: number of nodes (n)
-- Subsequent lines: `from to capacity`
-  - `from`: source node index (0 to n-1)
-  - `to`: destination node index (0 to n-1)
-  - `capacity`: non-negative integer capacity of the edge
-
-Example (`sample_network.txt`):
 ```
 4
 0 1 6
@@ -68,25 +70,69 @@ Example (`sample_network.txt`):
 2 3 5
 ```
 
-## Output Format
+Where:
+- First line: number of nodes (n)
+- Each subsequent line: `source destination capacity`
+- Node 0 is always the source
+- Node (n-1) is always the sink (node 3 in this example)
 
-The program outputs:
-1.  Ford-Fulkerson algorithm steps (each iteration's path, flow added, total flow).
-2.  Final flow details for each edge (Source, Destination, Capacity, Final Flow).
-3.  Total Maximum Flow value.
-4.  Total Time Taken for the algorithm execution (in milliseconds).
+## 📊 Output Example
 
-## Implementation Details
+```
+============================================
+Processing File: sample_network.txt
 
-- Uses the Ford-Fulkerson algorithm with Depth First Search (DFS) for finding augmenting paths.
-- Implements a residual graph internally to track available capacity changes.
-- Provides detailed step-by-step output of the algorithm's progression.
-- Includes basic error handling for file reading and parsing.
-- Uses an efficient adjacency list representation for the graph structure.
-- Includes execution time measurement.
+Total Nodes: 4
 
-## Performance
+Augmenting Path 1: 0 -> 1 -> 3 | Bottleneck = 3
+Augmenting Path 2: 0 -> 2 -> 3 | Bottleneck = 4
+Augmenting Path 3: 0 -> 1 -> 2 -> 3 | Bottleneck = 1
+No more augmenting paths.
 
-- **Time Complexity:** The theoretical time complexity of the basic Ford-Fulkerson algorithm can be high in the worst case, potentially O(E * f), where E is the number of edges and f is the maximum flow value. Using BFS (Edmonds-Karp) would give O(V * E^2). The current DFS implementation's performance can vary depending on the path chosen.
-- **Space Complexity:** O(V + E) due to the adjacency list representation, where V is the number of vertices and E is the number of edges.
-- **Memory Usage:** Varies based on input size. Larger benchmark networks might require increasing the Java heap space (e.g., `-Xmx1g` or more) when running. 
+Final flow through each edge:
+Edge from 0 to 1 | Capacity = 6 | Final Flow = 4
+Edge from 0 to 2 | Capacity = 4 | Final Flow = 4
+Edge from 1 to 2 | Capacity = 2 | Final Flow = 1
+Edge from 1 to 3 | Capacity = 3 | Final Flow = 3
+Edge from 2 to 3 | Capacity = 5 | Final Flow = 5
+
+Total Maximum Flow: 8
+Total Time Taken: 5.23 ms
+============================================
+```
+
+## 🔧 How It Works
+
+1. **Network Representation**: The graph is represented using an adjacency list with each edge storing its capacity and current flow.
+
+2. **Ford-Fulkerson Algorithm**:
+   - Start with zero flow on all edges
+   - Repeatedly find augmenting paths from source to sink
+   - For each path, find the bottleneck (minimum residual capacity)
+   - Augment flow along the path by this bottleneck amount
+   - Continue until no more augmenting paths can be found
+
+3. **Path Finding**: Uses depth-first search (DFS) to find augmenting paths through the residual graph.
+
+## 🧠 Implementation Details
+
+- **Data Structure**: Efficient adjacency list representation
+- **Algorithm**: Ford-Fulkerson with DFS for finding augmenting paths
+- **Time Complexity**: O(E·f) where E is the number of edges and f is the maximum flow
+- **Space Complexity**: O(V+E) where V is the number of vertices
+- **Residual Graph**: Maintained during algorithm execution to track available capacity
+
+## 📝 Testing with Your Own Network
+
+To test with a different network:
+
+1. Create a new text file following the input format described above
+2. Modify `src/Main.java`: Change the line `String inputFile = "sample_network.txt";` to your file path
+3. Recompile: `javac src/Main.java`
+4. Run: `java -cp src Main`
+
+---
+
+<div align="center">
+  <p><i>This implementation serves as an educational tool for understanding network flow algorithms</i></p>
+</div> 
